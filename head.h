@@ -19,7 +19,7 @@ using namespace std;
 #define trainParaN 56
 
 //#define delta 0.001
-#define traintime 10
+#define traintime 100
 #define ln_rate_max 0.7
 #define ln_rate_min 0.2
 extern int topolo[7][7];
@@ -33,6 +33,7 @@ extern double alpha[7];
 extern double alpha_new[7];
 extern double beta;
 extern int n;
+//extern double hill_para;
 extern double D;
 extern double dx;
 extern double dt;

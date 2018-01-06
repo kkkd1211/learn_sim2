@@ -2,7 +2,9 @@
 cp k.txt k_old.txt
 cp v.txt v_old.txt
 g++ *.cpp -o k -lm -O2
-rm ./output/*
+rm ./output/*.txt
+rm ./output/*.png
+rm ./output/*.gif
 ./k 1
 ./k 2
 ./k 3

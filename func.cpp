@@ -16,6 +16,15 @@ int para_req(double x,int i)
     }
     else if(i<56)           ///para is v
         return 1;
+    else if(i==56)          ///para is n
+    {
+        if(n>0)
+            return 1;
+        else
+            return 0;
+    }
+    else
+        return 0;
 }
 void setup()
 {
@@ -26,12 +35,14 @@ void setup()
     {
         for(j=3;j<7;j++)
         {
-            k[i][j]=1.0;
+            k[i][j]=0.5+(rand()/2147483647.0);
             v[i][j]=3*(2.0*(rand()/2147483647.0)-1.0);
             trainPara[4*i+j-3]=&k[i][j];
             trainPara[28+4*i+j-3]=&v[i][j];
         }
     }
+    //hill_para=0.5+(rand()/2147483647.0);
+    //trainPara[56]=&hill_para;
 #ifdef read1
     printf("reading data!!!\n\n");
     fp=fopen("k.txt","r");
@@ -121,6 +132,7 @@ int react(pgene Gene[7],int posi)
 double AactB(pgene Gene[7],int a,int b,int posi)
 {
     return(v[a][b]*((Gene[a]->c0[posi])/(k[a][b]+Gene[a]->c0[posi])));
+//    return(v[a][b]*((pow(Gene[a]->c0[posi],hill_para))/(pow(k[a][b],hill_para)+pow(Gene[a]->c0[posi],hill_para))));
 }
 int Sign(double x)
 {
@@ -159,13 +171,20 @@ double run(pgene Gene[7])
 //    tmp+=2*Gene[3]->error(50,80);
 //    tmp+=2*Gene[4]->error(65,100);
 //    tmp+=3*Gene[5]->error(50,70);
-    tmp+=1*Gene[3]->error(0,100);
-    tmp+=1*Gene[5]->error(0,100);
+
+//    tmp+=1*Gene[3]->error(60,100);
+//    tmp+=1.5*Gene[4]->error(80,100);
+//    tmp+=0*Gene[5]->error(0,100);
+//    tmp+=1.5*Gene[6]->error(60,100);
     return(tmp);
 }
 
 void training(pgene Gene[7])
 {
+    FILE *fp;
+    fp=fopen("error.txt","w");
+    fclose(fp);
+    fp=fopen("error.txt","a");
     int step,i,j;
     double init_err=0;
     double errL1,errL2,errR1,errR2;
@@ -175,6 +194,7 @@ void training(pgene Gene[7])
     for(step=0;step<traintime;step++)
     {
         init_err=run(Gene);
+        fprintf(fp,"%f\n",init_err);
         printf("\n\n\nstep:%d\terror:%.10f\n============k==================",step,init_err);
         for(i=0;i<trainParaN;i++)
         {
@@ -235,5 +255,49 @@ void training(pgene Gene[7])
         }
         ln_rate-=D_rate;
     }
+    fclose(fp);
+    return;
 }
 
+void print_topo(pgene Gene[7])
+{
+    FILE *fp;
+    int i,j;
+    fp=fopen("topo.txt","w");
+    fprintf(fp,"\tkni\thb\tkr\tgt\n");
+    for(i=0;i<7;i++)
+    {
+        if(i==0)    fprintf(fp,"Bcd");
+        else if(i==1)   fprintf(fp,"Nos");
+        else if(i==2)   fprintf(fp,"Tll");
+        else if(i==3)   fprintf(fp,"kni");
+        else if(i==4)   fprintf(fp," hb");
+        else if(i==5)   fprintf(fp," kr");
+        else if(i==6)   fprintf(fp," gt");
+        for(j=3;j<7;j++)
+        {
+            if(topo_fig(v[i][j])==0) fprintf(fp,"\t   ");
+            else if(topo_fig(v[i][j])==1) fprintf(fp,"\t + ");
+            else if(topo_fig(v[i][j])==2) fprintf(fp,"\t+++");
+            else if(topo_fig(v[i][j])==-1) fprintf(fp,"\t - ");
+            else if(topo_fig(v[i][j])==-2) fprintf(fp,"\t---");
+        }
+        fprintf(fp,"\n");
+    }
+    fprintf(fp,"\n\nerror=%f",run(Gene));
+    fclose(fp);
+    return;
+}
+int topo_fig(double x)
+{
+    if((x>0.01)&&(x<1))
+        return 1;
+    else if(x>=1)
+        return 2;
+    else if((x<-0.01)&&(x>-1))
+        return -1;
+    else if(x<-1)
+        return -2;
+    else
+        return 0;
+}

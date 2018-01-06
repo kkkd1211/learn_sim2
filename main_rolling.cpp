@@ -51,6 +51,7 @@ double C=1; //3.31;  //0.52;
 double alpha[7]={0,0,0,50,0.1,10,100};//0.13;  //2.9;
 double beta=0.13;
 int n=4;
+//double hill_para;
 double D=0.2;//0.65;
 double dx=0.1;
 double dt=0.0005;
@@ -347,6 +348,7 @@ training(Gene);
         fprintf(fp,"\n");
     }
 #endif
+    print_topo(Gene);
     return 0;
 
 }

@@ -14,4 +14,6 @@ double AactB(pgene Gene[7],int a,int b,int posi);
 int Sign(double x);
 void training(pgene Gene[7]);
 double run(pgene Gene[7]);
+void print_topo(pgene Gene[7]);
+int topo_fig(double x);
 #endif
