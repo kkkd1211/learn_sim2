@@ -4,8 +4,8 @@
 #include <stdlib.h>
 using namespace std;
 #define kkk printf("!!!\n");
-#define trainning0
-#define read1
+#define trainning1
+#define read0
 #define write1
 
 
@@ -15,6 +15,9 @@ using namespace std;
 
 #define Nx 100
 #define T 2000
+
+#define trainParaN 56
+
 //#define delta 0.001
 #define traintime 10
 #define ln_rate_max 0.7
@@ -40,7 +43,7 @@ extern double hb_in_data[Nx];
 extern double kr_in_data[Nx];
 extern double gt_in_data[Nx];
 extern double kni_in_data[Nx];
-
+extern double *trainPara[trainParaN];
 class gene;
 typedef gene *pgene;
 class gene
@@ -52,7 +55,7 @@ class gene
         double c0[Nx];
         double c1[Nx];
         double target[Nx];
-        
+
 //        void setinit();
         void next();
         void print(char name[20]);

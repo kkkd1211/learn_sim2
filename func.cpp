@@ -3,7 +3,53 @@
 #include<math.h>
 #include"head.h"
 #include"func.h"
+#include <time.h>
 using namespace std;
+int para_req(double x,int i)
+{
+    if((i>=0)&&(i<28))      ///para is k
+    {
+        if(x>=0)
+            return 1;
+        else
+            return 0;
+    }
+    else if(i<56)           ///para is v
+        return 1;
+}
+void setup()
+{
+    srand((unsigned)time(NULL));
+    int i,j;
+    FILE *fp,*fp2;
+    for(i=0;i<7;i++)
+    {
+        for(j=3;j<7;j++)
+        {
+            k[i][j]=1.0;
+            v[i][j]=3*(2.0*(rand()/2147483647.0)-1.0);
+            trainPara[4*i+j-3]=&k[i][j];
+            trainPara[28+4*i+j-3]=&v[i][j];
+        }
+    }
+#ifdef read1
+    printf("reading data!!!\n\n");
+    fp=fopen("k.txt","r");
+    fp2=fopen("v.txt","r");
+    for(i=0;i<7;i++)
+    {
+        for(j=0;j<7;j++)
+        {
+            fscanf(fp,"%lf\t",&k[i][j]);
+            fscanf(fp2,"%lf\t",&v[i][j]);
+        }
+        fscanf(fp,"\n");
+        fscanf(fp2,"\n");
+    }
+#endif
+    return;
+
+}
 int nextstep(pgene Gene[7])
 {
     int posi,i,j;
@@ -85,128 +131,6 @@ int Sign(double x)
     else
         return 0;
 }
-void training(pgene Gene[7])
-{
-    int step,i,j;
-    double init_err=0;
-    double err=0;
-    double err2=0;
-    double delta,tmp,de;
-    ln_rate=ln_rate_max;
-    for(step=0;step<traintime;step++)
-    {
-        init_err=0;
-        err=0;
-        init_err=run(Gene);
-        printf("step:%d\terr:%.10f\n",step,init_err);
-        for(i=0;i<7;i++)
-        {
-            for(j=3;j<7;j++)
-            {
-                delta=0.00001*k[i][j]+0.000001;
-                
-                k[i][j]+=delta;
-                err=run(Gene);
-                k[i][j]-=delta;
-                de=(init_err-err)/delta;
-
-                if((de>0)&&(err>0.0001))
-                {
-                    tmp=ln_rate*sqrt(de);
-                    k[i][j]+=tmp;
-                    err2=run(Gene);
-                    if((init_err-err2<0)||(err2<0.0001))
-                    {
-                        k[i][j]=k[i][j]-tmp+delta;
-                        init_err=err;
-                    }
-                    else
-                        init_err=err2;
-                }
-                else if(de<0)
-                {
-
-                    k[i][j]-=delta;
-                    err=run(Gene);
-                    k[i][j]+=delta;
-                    de=(init_err-err)/delta;
-                    if((de>0)&&(err>0.0001))
-                    {
-                        tmp=ln_rate*sqrt(de);
-                        k[i][j]-=tmp;
-                        if(k[i][j]<0)
-                        {
-                            k[i][j]+=tmp;
-                            tmp=k[i][j]*0.5;
-                            k[i][j]-=tmp;
-                        }
-                        err2=run(Gene);
-                        if((init_err-err2<0)||(err2<0.0001))
-                        {
-                            k[i][j]=k[i][j]+tmp-delta;
-                            init_err=err;
-                        }
-                        else
-                            init_err=err2;
-                    }
-                }
-                printf("%f(%f)\t",k[i][j],init_err);
-            }
-            printf("\n");
-        }
-
-
-
-
-        for(i=0;i<7;i++)
-        {
-            for(j=3;j<7;j++)
-            {
-                delta=0.00001*fabs(v[i][j])+0.00001;
-                v[i][j]+=delta;
-                err=run(Gene);
-                v[i][j]-=delta;
-                de=(init_err-err)/delta;
-                if((de>0)&&(err>0.0001))
-                {
-                    tmp=ln_rate*(de);                           //sqrt
-                    v[i][j]+=tmp;
-                    err2=run(Gene);
-                    if((init_err-err2<0)||(err2<0.0001))
-                    {
-                        v[i][j]=v[i][j]-tmp+delta;
-                        init_err=err;
-                    }
-                    else
-                        init_err=err2;
-                }
-                else if(de<0)
-                {
-                    v[i][j]-=delta;
-                    err=run(Gene);
-                    v[i][j]+=delta;
-                    de=(init_err-err)/delta;
-                    if((de>0)&&(err>0.0001))
-                    {
-                        tmp=ln_rate*(de);                       //sqrt
-                        v[i][j]-=tmp;
-                        err2=run(Gene);
-                        if((init_err-err2<0)||(err2<0.0001))
-                        {
-                            v[i][j]=v[i][j]+tmp-delta;
-                            init_err=err;
-                        }
-                        else
-                            init_err=err2;
-                    }
-                }
-                printf("\t%f(%f)",v[i][j],init_err);
-            }
-            printf("\n");
-        }
-        ln_rate-=D_rate;
-    }
-}
 double run(pgene Gene[7])
 {
     int i,j;
@@ -232,13 +156,84 @@ double run(pgene Gene[7])
     {
         tmp+=Gene[i]->error(0,100);
     }
-//    tmp+=2*Gene[4]->error(0,100);
-    tmp+=2*Gene[4]->error(65,100);
-    tmp+=2*Gene[3]->error(50,80);
-    tmp+=3*Gene[5]->error(50,70);
+//    tmp+=2*Gene[3]->error(50,80);
+//    tmp+=2*Gene[4]->error(65,100);
+//    tmp+=3*Gene[5]->error(50,70);
+    tmp+=1*Gene[3]->error(0,100);
+    tmp+=1*Gene[5]->error(0,100);
     return(tmp);
 }
 
+void training(pgene Gene[7])
+{
+    int step,i,j;
+    double init_err=0;
+    double errL1,errL2,errR1,errR2;
+    double delta0,deltaL,deltaR;
+    double tmp_err,tmp_delta;
+    ln_rate=ln_rate_max;
+    for(step=0;step<traintime;step++)
+    {
+        init_err=run(Gene);
+        printf("\n\n\nstep:%d\terror:%.10f\n============k==================",step,init_err);
+        for(i=0;i<trainParaN;i++)
+        {
+            tmp_err=init_err;
+            delta0=0.00001*(0.1+fabs(*trainPara[i]));
+            *trainPara[i]+=delta0;
+            errR1=run(Gene);
+            *trainPara[i]-=2*delta0;
+            errL1=run(Gene);
+            *trainPara[i]+=delta0;
+            errR2=2*init_err;
+            errL2=2*init_err;
+            if((init_err>errR1)&&(errR1>0.0001)&&(para_req(*trainPara[i]+delta0,i)))
+            {
+                tmp_err=errR1;
+                tmp_delta=delta0;
 
+                deltaR=ln_rate*sqrt((init_err-errR1)/delta0);
+                *trainPara[i]+=deltaR;
+                errR2=run(Gene);
+                *trainPara[i]-=deltaR;
 
+                if((tmp_err>errR2)&&(errR2>0.0001)&&(para_req(*trainPara[i]+deltaR,i)))
+                {
+                    tmp_err=errR2;
+                    tmp_delta=deltaR;
+                }
+            }
+            if((init_err>errL1)&&(errL1>0.0001)&&(para_req(*trainPara[i]-delta0,i)))
+            {
+                if(tmp_err>errL1)
+                {
+                    tmp_err=errL1;
+                    tmp_delta=0.0-delta0;
+                }
+
+                deltaL=ln_rate*sqrt((init_err-errL1)/delta0);
+                *trainPara[i]-=deltaL;
+                errL2=run(Gene);
+                *trainPara[i]+=deltaL;
+
+                if((tmp_err>errL2)&&(errL2>0.0001)&&(para_req(*trainPara[i]-deltaL,i)))
+                {
+                    tmp_err=errL2;
+                    tmp_delta=0.0-deltaL;
+                }
+            }
+            if(init_err!=tmp_err)
+            {
+                init_err=tmp_err;
+                *trainPara[i]+=tmp_delta;
+            }
+            if(i%4==0)
+                printf("\n");
+            if(i==28)
+                printf("=================v================\n");
+            printf("\t%f(%f)",*trainPara[i],init_err);
+        }
+        ln_rate-=D_rate;
+    }
+}
 

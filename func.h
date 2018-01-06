@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include "head.h"
 using namespace std;
+void setup();
 int nextstep(pgene Gene[7]);
 int diff(pgene Gene[7],int posi);
 int deg(pgene Gene[7],int posi);

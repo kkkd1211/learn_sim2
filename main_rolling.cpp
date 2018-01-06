@@ -1,10 +1,11 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include<math.h>
+#include <math.h>
 #include <string.h>
 #include "head.h"
 #include "func.h"
 #include <sys/stat.h>
+#include <time.h>
 using namespace std;
 #define K0 1.0  //7.3
 #define K1 6.31 //8.1
@@ -42,25 +43,8 @@ double v[7][7]={    0,  0,  0,  1, -1,  0,  1,
                     0,  0,  0,  0,  0,  0, -1,
                     0,  0,  0,  0,  0, -1,  0
                     };
-/*
-double k[7][7]={    0,  0,  0,  9.36,   3.02,   0.71,   1.27,
-                    0,  0,  0,  16.15,  0.98,   0.67,   1.04,
-                    0,  0,  0,  0.77,   1.37,   0.00,   0.45,
-                    0,  0,  0,  1.67,   1.97,   0.61,   0.05,
-                    0,  0,  0,  2.12,   2.58,   3.82,   0.94,
-                    0,  0,  0,  3.18,   0.34,   0.49,   0.90,
-                    0,  0,  0,  0.96,   1.03,   3.37,   0.32,
-                };
-double v[7][7]={    0,  0,  0,  7.50,   -3.60,  -0.43,  0.68,
-                    0,  0,  0,  1.61,   0.00,    0.08,  1.00,
-                    0,  0,  0,  -1.53,  0.48,   -2.20,  -0.91,
-                    0,  0,  0,  2.78,   -0.36,  2.00,   -0.34,
-                    0,  0,  0,  -2.12,  1.72,   -1.26,  0.00,
-                    0,  0,  0,  0.87,   -0.13,  0.73,   -1.30,
-                    0,  0,  0,  0.00,   -0.04,  -1.34,  0.32,
-                };
-*/
 
+double *trainPara[trainParaN];
 
 
 double C=1; //3.31;  //0.52;
@@ -81,37 +65,16 @@ double D_rate=(ln_rate_max-ln_rate_min)/traintime;
 int main(int argc,char *argv[])
 {
 	int i,j;
-    for(i=0;i<7;i++)
-    {
-        for(j=3;j<7;j++)
-        {  
-            k[i][j]=1.0;
-//          v[i][j]=0.1;
-        }
-    }
     FILE *fp,*fp2;
-#ifdef read1
-    printf("reading data!!!\n\n");
-    fp=fopen("k.txt","r");
-    fp2=fopen("v.txt","r");
-    for(i=0;i<7;i++)
-    {
-        for(j=0;j<7;j++)
-        {
-            fscanf(fp,"%lf\t",&k[i][j]);
-            fscanf(fp2,"%lf\t",&v[i][j]);
-        }
-        fscanf(fp,"\n");
-        fscanf(fp2,"\n");
-    }
-#endif
+    setup();
+
     mkdir("output",0777);
     char kni[35]="output/kni.txt";
     char hb[35]="output/hb.txt";
     char kr[35]="output/kr.txt";
     char gt[35]="output/gt.txt";
     char fi[35]="output/final.txt";
-    
+
     char kni_tg[35]="data_final/kni_target.txt";
     char hb_tg[35]="data_final/hb_target.txt";
     char kr_tg[35]="data_final/kr_target.txt";
@@ -145,14 +108,14 @@ int main(int argc,char *argv[])
     if(mu_type!=0)
         return 0;
 #endif
-    if(mu_type==0)    
+    if(mu_type==0)
     {
         printf("\nWT!\n\n");
         strcpy(kni_in,"input/kni_in_wt.txt");
         strcpy(hb_in,"input/hb_in_wt.txt");
         strcpy(kr_in,"input/kr_in_wt.txt");
         strcpy(gt_in,"input/gt_in_wt.txt");
-        
+
         strcpy(kni,"output/kni.txt");
         strcpy(hb,"output/hb.txt");
         strcpy(kr,"output/kr.txt");
@@ -274,7 +237,7 @@ int main(int argc,char *argv[])
     for(i=0;i<Nx;i++)
         fscanf(fp,"%lf\t",&tmp[i]);
     Gene[0]=new gene(tmp);
-    fclose(fp);    
+    fclose(fp);
 //Nos
     for(i=0;i<Nx;i++)
         tmp[i]=Gene[0]->c0[Nx-1-i];
@@ -343,20 +306,15 @@ training(Gene);
     Gene[5]->setvar(kr_in_data);
     Gene[6]->setvar(gt_in_data);
 
-//    for(i=0;i<7;i++)
-//    {
-//        for(j=0;j<7;j++)
-//            topolo[i][j]=Sign(k[i][j]);
-//    }
     for(i=0;i<T;i++)
     {
         if((i%(T/50)==0)||(i==0))
-        {   
+        {
             Gene[3]->print(kni);
             Gene[4]->print(hb);
             Gene[5]->print(kr);
             Gene[6]->print(gt);
-        }    
+        }
         nextstep(Gene);
         for(j=3;j<7;j++)
         {
