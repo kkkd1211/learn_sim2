@@ -16,7 +16,7 @@ using namespace std;
 #define Nx 100
 #define T 2000
 
-#define trainParaN 56
+#define trainParaN 57       ///28:v 28:k 1:n
 
 //#define delta 0.001
 #define traintime 100
@@ -33,7 +33,7 @@ extern double alpha[7];
 extern double alpha_new[7];
 extern double beta;
 extern int n;
-//extern double hill_para;
+extern double hill_para;
 extern double D;
 extern double dx;
 extern double dt;
@@ -55,6 +55,7 @@ class gene
         gene(double ini_c[Nx]);
         double c0[Nx];
         double c1[Nx];
+        double c0_hill[Nx];
         double target[Nx];
 
 //        void setinit();

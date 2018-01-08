@@ -30,7 +30,7 @@ void setup()
 {
     srand((unsigned)time(NULL));
     int i,j;
-    FILE *fp,*fp2;
+    FILE *fp;
     for(i=0;i<7;i++)
     {
         for(j=3;j<7;j++)
@@ -41,22 +41,16 @@ void setup()
             trainPara[28+4*i+j-3]=&v[i][j];
         }
     }
-    //hill_para=0.5+(rand()/2147483647.0);
-    //trainPara[56]=&hill_para;
+    hill_para=0.5+(rand()/2147483647.0);
+    trainPara[56]=&hill_para;
 #ifdef read1
     printf("reading data!!!\n\n");
-    fp=fopen("k.txt","r");
-    fp2=fopen("v.txt","r");
-    for(i=0;i<7;i++)
+    fp=fopen("training_data.txt","r");
+    for(i=0;i<trainParaN;i++)
     {
-        for(j=0;j<7;j++)
-        {
-            fscanf(fp,"%lf\t",&k[i][j]);
-            fscanf(fp2,"%lf\t",&v[i][j]);
-        }
-        fscanf(fp,"\n");
-        fscanf(fp2,"\n");
+        fscanf(fp,"%lf\n",trainPara[i]);
     }
+    fclose(fp);
 #endif
     return;
 
@@ -69,6 +63,8 @@ int nextstep(pgene Gene[7])
         for(i=0;i<Nx;i++)
         {
             Gene[j]->c1[i]=Gene[j]->c0[i];
+//            Gene[j]->c0_hill[i]=pow(Gene[j]->c0[i],hill_para);
+            Gene[j]->c0_hill[i]=Gene[j]->c0[i];
         }
     }
     for(posi=0;posi<Nx;posi++)
@@ -76,7 +72,6 @@ int nextstep(pgene Gene[7])
         diff(Gene,posi);
         deg(Gene,posi);
         react(Gene,posi);
-//        getchar();
     }
 }
 int diff(pgene Gene[7],int posi)
@@ -131,8 +126,8 @@ int react(pgene Gene[7],int posi)
 }
 double AactB(pgene Gene[7],int a,int b,int posi)
 {
-    return(v[a][b]*((Gene[a]->c0[posi])/(k[a][b]+Gene[a]->c0[posi])));
-//    return(v[a][b]*((pow(Gene[a]->c0[posi],hill_para))/(pow(k[a][b],hill_para)+pow(Gene[a]->c0[posi],hill_para))));
+///    return(v[a][b]*((Gene[a]->c0[posi])/(k[a][b]+Gene[a]->c0[posi])));
+    return(v[a][b]*((Gene[a]->c0_hill[posi])/(k[a][b]+Gene[a]->c0_hill[posi])));
 }
 int Sign(double x)
 {
