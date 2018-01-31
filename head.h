@@ -19,7 +19,7 @@ using namespace std;
 #define trainParaN 57       ///28:v 28:k 1:n
 
 //#define delta 0.001
-#define traintime 100
+#define traintime 200
 #define ln_rate_max 0.7
 #define ln_rate_min 0.2
 extern int topolo[7][7];

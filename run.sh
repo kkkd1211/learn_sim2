@@ -1,7 +1,7 @@
 #!/bin/bash
-cp k.txt k_old.txt
-cp v.txt v_old.txt
-cp training_data.txt training_data_old.txt
+cp para/k.txt para/k_old.txt
+cp para/v.txt para/v_old.txt
+cp para/training_data.txt para/training_data_old.txt
 g++ *.cpp -o k -lm -O2
 rm ./output/*.txt
 rm ./output/*.png

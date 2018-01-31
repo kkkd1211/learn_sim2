@@ -5,6 +5,35 @@
 #include"func.h"
 #include <time.h>
 using namespace std;
+void setup()
+{
+    srand((unsigned)time(NULL));
+    int i,j;
+    FILE *fp;
+    for(i=0;i<7;i++)
+    {
+        for(j=3;j<7;j++)
+        {
+            k[i][j]=0.5+(rand()/2147483647.0);
+            v[i][j]=3*(2.0*(rand()/2147483647.0)-1.0);
+            trainPara[4*i+j-3]=&k[i][j];
+            trainPara[28+4*i+j-3]=&v[i][j];
+        }
+    }
+    hill_para=0.5+(rand()/2147483647.0);
+    trainPara[56]=&hill_para;
+#ifdef read1
+    printf("reading data!!!\n\n");
+    fp=fopen("para/training_data.txt","r");
+    for(i=0;i<trainParaN;i++)
+    {
+        fscanf(fp,"%lf\n",trainPara[i]);
+    }
+    fclose(fp);
+#endif
+    return;
+
+}
 int para_req(double x,int i)
 {
     if((i>=0)&&(i<28))      ///para is k
@@ -26,35 +55,6 @@ int para_req(double x,int i)
     else
         return 0;
 }
-void setup()
-{
-    srand((unsigned)time(NULL));
-    int i,j;
-    FILE *fp;
-    for(i=0;i<7;i++)
-    {
-        for(j=3;j<7;j++)
-        {
-            k[i][j]=0.5+(rand()/2147483647.0);
-            v[i][j]=3*(2.0*(rand()/2147483647.0)-1.0);
-            trainPara[4*i+j-3]=&k[i][j];
-            trainPara[28+4*i+j-3]=&v[i][j];
-        }
-    }
-    hill_para=0.5+(rand()/2147483647.0);
-    trainPara[56]=&hill_para;
-#ifdef read1
-    printf("reading data!!!\n\n");
-    fp=fopen("training_data.txt","r");
-    for(i=0;i<trainParaN;i++)
-    {
-        fscanf(fp,"%lf\n",trainPara[i]);
-    }
-    fclose(fp);
-#endif
-    return;
-
-}
 int nextstep(pgene Gene[7])
 {
     int posi,i,j;
@@ -63,8 +63,8 @@ int nextstep(pgene Gene[7])
         for(i=0;i<Nx;i++)
         {
             Gene[j]->c1[i]=Gene[j]->c0[i];
-//            Gene[j]->c0_hill[i]=pow(Gene[j]->c0[i],hill_para);
-            Gene[j]->c0_hill[i]=Gene[j]->c0[i];
+            Gene[j]->c0_hill[i]=pow(Gene[j]->c0[i],hill_para);
+//            Gene[j]->c0_hill[i]=Gene[j]->c0[i];
         }
     }
     for(posi=0;posi<Nx;posi++)
@@ -177,9 +177,9 @@ double run(pgene Gene[7])
 void training(pgene Gene[7])
 {
     FILE *fp;
-    fp=fopen("error.txt","w");
+    fp=fopen("para/error.txt","w");
     fclose(fp);
-    fp=fopen("error.txt","a");
+    fp=fopen("para/error.txt","a");
     int step,i,j;
     double init_err=0;
     double errL1,errL2,errR1,errR2;
@@ -200,8 +200,8 @@ void training(pgene Gene[7])
             *trainPara[i]-=2*delta0;
             errL1=run(Gene);
             *trainPara[i]+=delta0;
-            errR2=2*init_err;
-            errL2=2*init_err;
+            errR2=init_err+init_err;
+            errL2=init_err+init_err;
             if((init_err>errR1)&&(errR1>0.0001)&&(para_req(*trainPara[i]+delta0,i)))
             {
                 tmp_err=errR1;
@@ -258,7 +258,7 @@ void print_topo(pgene Gene[7])
 {
     FILE *fp;
     int i,j;
-    fp=fopen("topo.txt","w");
+    fp=fopen("para/topo.txt","w");
     fprintf(fp,"\tkni\thb\tkr\tgt\n");
     for(i=0;i<7;i++)
     {

@@ -106,6 +106,7 @@ int main(int argc,char *argv[])
         mu_type=0;
     }
 #ifdef trainning1
+    printf("training!!\n\n");
     if(mu_type!=0)
         return 0;
 #endif
@@ -328,7 +329,7 @@ training(Gene);
     Gene[5]->print(fi);
     Gene[6]->print(fi);
 #ifdef write1
-    fp=fopen("k.txt","w");
+    fp=fopen("para/k.txt","w");
     for(i=0;i<7;i++)
     {
         for(j=0;j<7;j++)
@@ -338,7 +339,7 @@ training(Gene);
         fprintf(fp,"\n");
     }
     fclose(fp);
-    fp=fopen("v.txt","w");
+    fp=fopen("para/v.txt","w");
     for(i=0;i<7;i++)
     {
         for(j=0;j<7;j++)
@@ -348,7 +349,7 @@ training(Gene);
         fprintf(fp,"\n");
     }
     fclose(fp);
-    fp=fopen("training_data.txt","w");
+    fp=fopen("para/training_data.txt","w");
     for(i=0;i<trainParaN;i++)
     {
         fprintf(fp,"%f\n",*trainPara[i]);
